@@ -17,7 +17,7 @@ int maximise_score_per_testcase (const int testcase_size, const int *A) {
     return optimal_score;
 }
 
-int main2() {
+int main3() {
     std::ios::sync_with_stdio(false);  // Magic Dani line
     int T; // Number of test cases
     std::cin >> T;

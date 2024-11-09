@@ -1,6 +1,6 @@
 #include <iostream>
 
-int main() {
+int main2() {
     std::ios::sync_with_stdio(false);  // Magic Dani line
     std::cin.tie(nullptr);  // Even more magic
     int N; // Number of cards
