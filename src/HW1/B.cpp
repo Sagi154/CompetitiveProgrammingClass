@@ -1,37 +1,75 @@
 #include <iostream>
+#include <algorithm>
 
-int main2() {
-    std::ios::sync_with_stdio(false);  // Magic Dani line
-    std::cin.tie(nullptr);  // Even more magic
-    int N; // Number of cards
-    std::cin >> N;
-    int prev_A = 0, prev_B = 0;
-    long long prev_A_flips = 1; // Number of possible flips of previous cards when A_i-1 is faced up
-    long long prev_B_flips = 1; // Number of possible flips of previous cards when B_i-1 is faced up
-    int curr_A, curr_B;
-    std::cin >> prev_A;
-    std::cin >> prev_B;
-    for(int i = 1; i < N; i++) {
-        long long curr_A_flips = 0; // Number of flips of previous cards when B is faced up
-        long long curr_B_flips = 0; // Number of flips of previous cards when B is faced up (has been flipped)
-        std::cin >> curr_A;
-        std::cin >> curr_B;
-        if(curr_A == prev_A && prev_A == prev_B && prev_B == curr_B) { // No possible combinations for this i
-            std::cout << 0;
-            return 0;
-        }
-        if (curr_A != prev_A) // A_i faced up compatible with A_i-1 faced up
-            curr_A_flips += prev_A_flips;
-        if (curr_A != prev_B) // A_i faced up compatible with B_i-1 faced up
-            curr_A_flips += prev_B_flips;
-        if (curr_B != prev_A) // B_i faced up compatible with A_i-1 faced up
-            curr_B_flips += prev_A_flips;
-        if (curr_B != prev_B) // B_i faced up compatible with B_i-1 faced up
-            curr_B_flips += prev_B_flips;
-        prev_A = curr_A;
-        prev_A_flips = curr_A_flips % 998244353;
-        prev_B = curr_B;
-        prev_B_flips = curr_B_flips % 998244353;
+/***
+ * This algorithm sorts the ranges by their left side, and then it runs over
+ * all the ranges twice, once for checking which ranges are contained in other ranges,
+ * and once for checking which ranges contain other ranges.
+ * For a given [a,b], since the ranges are sorted we can know if there exists some other range
+ * that may contain it or if it's contained in another range
+ * (depending on how we go through the sorted ranges) , and by saving previously
+ * seen b values (max or min depending on what we're currently looking for)
+ * we can find out if [a,b] is contained/contains another range.
+ * Time complexity : O(nlogn)
+ * Memory complexity : O(n)
+ */
+
+struct Point{
+  int a;
+  int b;
+  int index;
+  };
+
+int main(){
+  std::ios::sync_with_stdio(false);  // Magic Dani line
+  int n; // Number of ranges
+  std::cin >> n;
+  struct Point* points = new struct Point[n];
+  for(int i = 0; i < n; i++){ // Saving all ranges to an array
+    std::cin >> points[i].a >> points[i].b;
+    points[i].index = i;
     }
-    std::cout << (prev_A_flips + prev_B_flips) % 998244353 << std::endl; // Total possible ways to flip is the sum of the two faces of the last card
-}
+  // Sorting the ranges so left side are in ascending order
+  std::sort(points, points + n, [](struct Point &p1, struct Point &p2) {
+    if (p1.a != p2.a){
+      return p1.a < p2.a;
+      } else {
+        return p1.b > p2.b;
+      }
+      });
+  int* contained = new int[n];
+  contained[0] = 0; // Range with minimum 'a' can't possibly be contained in another range
+  int r_max = points[0].b;
+  for(int i = 1; i < n; i++) {  // Looking for ranges that are contained in some other range
+    if(points[i].b <= r_max) {
+      // Range [points[i].a, points[i].b] is contained in some other range
+      contained[points[i].index] = 1;
+    } else { // Not contained in another range, new r_max
+      contained[points[i].index] = 0;
+      r_max = points[i].b;
+    }
+  }
+  int* contains = new int[n];
+  contains[points[n-1].index] = 0; // Range with maximum 'a' can't possibly contain another range
+  int r_min = points[n-1].b;
+  for(int i = n-2; i > -1; i--) {   // Looking for ranges that contain some other range
+    if(points[i].b >= r_min) {
+      // Range [points[i].a, points[i].b] contains some other range
+      contains[points[i].index] = 1;
+    } else { // Doesn't contain another range, new r_min
+      contains[points[i].index] = 0;
+      r_min = points[i].b;
+    }
+  }
+  std::cout << contains[0];
+  for(int i = 1; i < n; i++) { // Printing first output line
+    std::cout << " " << contains[i];
+  }
+  std::cout << std::endl;
+  std::cout << contained[0];
+  for(int i = 1; i < n; i++) { // Printing second output line
+    std::cout << " " << contained[i];
+  }
+  }
+
+
