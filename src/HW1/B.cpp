@@ -20,7 +20,7 @@ struct Point{
   int index;
   };
 
-int main(){
+int main123(){
   std::ios::sync_with_stdio(false);  // Magic Dani line
   int n; // Number of ranges
   std::cin >> n;
