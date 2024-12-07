@@ -14,11 +14,11 @@ vector<int> results;
 void solve() {
     int n, m;
     cin >> n >> m;
-    vector<int> color(n);
+    vector<int> color;
     for(int i = 0; i < n; i++) {
       cin >> color[i];
     }
-    vector<vector<int>> graph;
+    vector<int> graph[n];
     cout << "n and m are: " << n << " " << m << endl;
     for (int i = 0; i < m; ++i) {
         int u, v;
@@ -31,8 +31,8 @@ void solve() {
         results.push_back(-1) ;
         return;
     }
-    vector<int> d_player1(n);
-    vector<int> d_player2(n);
+    vector<int> d_player1;
+    vector<int> d_player2;
     queue<int> q_player1;                // Queue for BFS
     queue<int> q_player2;                // Queue for BFS
     vector<int> player1_blues;

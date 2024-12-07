@@ -8,10 +8,9 @@ const int MAXN = 100000; // Maximum size
 
 /* ------- BFS --------- */
 class BFS {
-  vector<int> d;
-  vector<int> source;
+    int n, m;
+    vector<int> adj[MAX_N], dist;
 void BFS(const vector<vector<int>>& graph, int start_node) {
-    vector<int> color;  // Set to track visited nodes
     queue<int> q;                // Queue for BFS
     for (int i = 0; i < n; i++) {
       color[i] = 0;
@@ -40,6 +39,21 @@ void BFS(const vector<vector<int>>& graph, int start_node) {
         }
         q.pop();
         color[node] = 2; // Turn to black
+    }
+}
+
+void bfs(int s) {
+    dist.assign(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    while (q.size()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) {
+            if (dist[v] == -1) {
+                dist[v] = dist[u] + 1;
+                q.push(v);
+            }
+        }
     }
 }
 };
