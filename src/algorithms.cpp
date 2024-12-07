@@ -8,26 +8,40 @@ const int MAXN = 100000; // Maximum size
 
 /* ------- BFS --------- */
 class BFS {
-    vector<vector<int>> g;
-    vector<bool> visible;
-    void bfs(vector<int>& starts){
-        for(int x : starts)
-            visible[x]=true;
-        vector<int> cur_level=starts;
-        int dist=0;
-        while (!cur_level.empty()) {
-            vector<int> next_level;
-            for(int f : cur_level) {
-                for(int s : g[f]) {
-                    if (visible[s]) continue;
-                    visible[s]=true;
-                    next_level.push_back(s);
-                }
-            }
-            cur_level = next_level;
-            dist++;
-        }
+  vector<int> d;
+  vector<int> source;
+void BFS(const vector<vector<int>>& graph, int start_node) {
+    vector<int> color;  // Set to track visited nodes
+    queue<int> q;                // Queue for BFS
+    for (int i = 0; i < n; i++) {
+      color[i] = 0;
+      d[i] = 1000000000;
+      source[i] = null;
     }
+    color[start_node] = 1;
+    d[start_node] = 0;
+    source[start_node] = null;
+    q.push(start_node);
+    // Finished initialization
+
+    // Main loop
+    while (!q.empty()) {
+        int node = q.front();
+        cout << node << " ";  // Process the current node (you can do other actions here)
+
+        // Visit all unvisited neighbors
+        for (int neighbor : graph[node]) {
+          if (color[neighbor] == 0){
+            color[neighbor] = 1; // Turn to grey
+            d[neighbor] = d[node] + 1;
+            source[neighbor] = node;
+            q.push(neighbor);
+            }
+        }
+        q.pop();
+        color[node] = 2; // Turn to black
+    }
+}
 };
 
 /* ------- DFS --------- */
@@ -90,7 +104,7 @@ int N = 5;
 vector<int> vect(N); // Creating vector of size N
 
 // main template
-int main3() {
+int main() {
   ios_base::sync_with_stdio(false);
   cin.tie(NULL);
   int T = 1;
