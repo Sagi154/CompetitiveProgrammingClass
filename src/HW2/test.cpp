@@ -1,89 +1,82 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <climits>
-
+#include <bits/stdc++.h>
 using namespace std;
 
-int bfs(int start1, int start2, const vector<vector<int>>& adj, const vector<int>& color, int N) {
-    vector<int> dist1(N + 1, -1);  // Distance array for Player1
-    vector<int> dist2(N + 1, -1);  // Distance array for Player2
+#define ll long long
 
-    queue<int> queue1, queue2;
+const ll MOD = 1e9 + 7;
 
-    dist1[start1] = 0;  // Player1 starts at vertex 1
-    dist2[start2] = 0;  // Player2 starts at vertex N
+ll n;
+vector<ll> vis, val;
+vector<vector<ll>> adj, dp;
 
-    queue1.push(start1);
-    queue2.push(start2);
+void dfs(ll u) {
+    vis[u] = 1;
 
-    while (!queue1.empty() || !queue2.empty()) {
-        // Process Player1's queue
-        if (!queue1.empty()) {
-            int current1 = queue1.front();
-            queue1.pop();
+    if (adj[u].empty()) {
+        // Leaf node: all citizens are caught here
+        dp[u] = {val[u], 0, 1};
+        return;
+    }
 
-            // Visit all adjacent vertices of Player1
-            for (int neighbor : adj[current1]) {
-                if (dist1[neighbor] == -1) {  // If not visited
-                    dist1[neighbor] = dist1[current1] + 1;
-                    queue1.push(neighbor);
-                }
-            }
-        }
+    ll tmp_max = -1;
+    dp[u] = {0, 0, 0};
 
-        // Process Player2's queue
-        if (!queue2.empty()) {
-            int current2 = queue2.front();
-            queue2.pop();
+    for (ll v : adj[u]) {
+        if (!vis[v]) dfs(v);
+    }
 
-            // Visit all adjacent vertices of Player2
-            for (int neighbor : adj[current2]) {
-                if (dist2[neighbor] == -1) {  // If not visited
-                    dist2[neighbor] = dist2[current2] + 1;
-                    queue2.push(neighbor);
-                }
-            }
+    for (ll v : adj[u]) {
+        tmp_max = max(tmp_max, dp[v][0]);
+        dp[u][2] += dp[v][2]; // Total leaf nodes in subtree
+    }
+    dp[u][0] = tmp_max;
+
+    for (ll v : adj[u]) {
+        if (dp[v][0] < tmp_max) {
+            dp[u][1] += dp[v][1] + dp[v][2] * (tmp_max - dp[v][0]);
+        } else {
+            dp[u][1] += dp[v][1];
         }
     }
 
-    // If both players reach their target positions
-    if (dist1[N] != -1 && dist2[1] != -1) {
-        return max(dist1[N], dist2[1]);  // Return the maximum number of moves
+    // Citizens at this node try to minimize their capture
+    if (val[u] > dp[u][1]) {
+        ll tmp = val[u] - dp[u][1];
+        dp[u][0] += (tmp + dp[u][2] - 1) / dp[u][2]; // Equivalent to ceil(tmp / dp[u][2])
+        dp[u][1] = dp[u][2] - (tmp % dp[u][2]);
+        if (dp[u][1] == dp[u][2]) dp[u][1] = 0;
     } else {
-        return -1;  // If it's impossible
+        dp[u][1] -= val[u];
     }
 }
 
 void solve() {
-    int T;
-    cin >> T;  // Read number of test cases
+    cin >> n;
 
-    while (T--) {
-        int N, M;
-        cin >> N >> M;  // Read N (vertices) and M (edges)
+    vis.assign(n, 0);
+    dp.assign(n, vector<ll>(3, 0));
+    adj.assign(n, vector<ll>());
+    val.assign(n, 0);
 
-        vector<int> color(N + 1);
-        for (int i = 1; i <= N; ++i) {
-            cin >> color[i];  // Read the color array
-        }
-
-        vector<vector<int>> adj(N + 1);  // Adjacency list
-
-        // Read edges and build the graph
-        for (int i = 0; i < M; ++i) {
-            int u, v;
-            cin >> u >> v;
-            adj[u].push_back(v);
-            adj[v].push_back(u);
-        }
-
-        // Run BFS from vertex 1 (Player1's start) and vertex N (Player2's start)
-        cout << bfs(1, N, adj, color, N) << endl;
+    for (ll i = 1; i < n; i++) {
+        ll u;
+        cin >> u;
+        u--;
+        adj[u].push_back(i);
     }
+
+    for (ll i = 0; i < n; i++) {
+        cin >> val[i];
+    }
+
+    dfs(0); // Start DFS from root node
+    cout << dp[0][0] << endl; // Maximum citizens caught by the bandit
 }
 
 int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+
     solve();
     return 0;
 }
