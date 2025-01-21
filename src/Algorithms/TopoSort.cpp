@@ -1,6 +1,8 @@
 // Traversal path of a typical DFS is a reverse topological order
 // Problem link: https://cses.fi/problemset/task/1679
 
+// https://ncduy0303.github.io/Competitive-Programming/
+
 #include <bits/stdc++.h>
 
 using namespace std;
